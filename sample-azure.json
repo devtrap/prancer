@@ -1,0 +1,89 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+               "description": "Local Admin username for VM."
+            }
+         },
+         "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+               "description": "Password for local admin account."
+            }
+         },
+         "dnsLabelPrefix": {
+            "type": "string",
+            "metadata": {
+               "description": "DNS Name for Public IP used to access the VM."
+            }
+         },
+         "windowsOSVersion": {
+            "type": "string",
+            "defaultValue": "2012-R2-Datacenter",
+            "allowedValues": [
+               "2012-R2-Datacenter",
+               "2016-Datacenter"
+            ],
+            "metadata": {
+               "description": "The Windows version for the VM."
+            }
+         },
+         "departmentName": {
+            "type": "string",
+            "defaultValue": "MyDepartment",
+            "metadata": {
+               "description": "Department Tag"
+            }
+         },
+         "applicationName": {
+            "type": "string",
+            "defaultValue": "MyApp",
+            "metadata": {
+               "description": "Application Tag"
+            }
+         },
+         "createdBy": {
+            "type": "string",
+            "defaultValue": "MyName",
+            "metadata": {
+               "description": "Created By Tag"
+            }
+          }
+    },
+    "variables": { 
+        "storageAccountName": "[concat(uniquestring(resourceGroup().id), 'satagsvm')]",
+        "imagePublisher": "MicrosoftWindowsServer",
+        "imageOffer": "WindowsServer",
+        "nicName": "SrvNIC",
+        "addressPrefix": "192.168.1.0/16",
+        "subnetName": "Subnet1",
+        "subnetPrefix": "192.168.1.0/24",
+        "storageAccountType": "Standard_LRS",
+        "publicIPAddressName": "myPublicIP",
+        "publicIPAddressType": "Dynamic",
+        "vmName": "VM1",
+        "vmSize": "Standard_D1",
+        "virtualNetworkName": "MyVNET",
+        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
+        "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]",
+        "apiVersion": "2015-06-15"
+    },
+    "resources": [{
+        "type": "Microsoft.Storage/storageAccounts",
+        "name": "[variables('storageAccountName')]",
+        "apiVersion": "[variables('apiVersion')]",
+        "location": "[resourceGroup().location]",
+        "tags": {
+           "Department": "[parameters('departmentName')]",
+           "Application": "[parameters('applicationName')]",
+           "Created By": "[parameters('createdBy')]"
+        },
+        "properties": {
+           "accountType": "[variables('storageAccountType')]"
+        }
+    }],
+    "outputs": {} 
+ }
